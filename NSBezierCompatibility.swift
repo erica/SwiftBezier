@@ -12,21 +12,16 @@
 #endif
 
 // Workaround for having distinct platform definitions of the same Objective-C call
-#if os(OSX)
-    extension NSString {
-        // Returns the bounding box size the receiver occupies when drawn with the given attributes.
-        public func _size(attributes attrs: [String : Any]? = nil) -> CGSize {
+extension NSString {
+    // Returns the bounding box size the receiver occupies when drawn with the given attributes.
+    public func _size(attributes attrs: [String : Any]? = nil) -> CGSize {
+        #if os(OSX)
             return size(withAttributes: attrs)
-        }
-    }
-#else
-    extension NSString {
-        // Returns the bounding box size the receiver occupies when drawn with the given attributes.
-        public func _size(attributes attrs: [String : Any]? = nil) -> CGSize {
+        #else
             return size(attributes: attrs)
-        }
+        #endif
     }
-#endif
+}
 
 #if os(OSX)
     extension NSBezierPath {

@@ -38,7 +38,7 @@
     }
 #endif
 
-public func currentGraphicsContext() -> CGContext? {
+fileprivate func currentGraphicsContext() -> CGContext? {
     #if os(OSX)
         guard let graphicsContext = NSGraphicsContext.current() else { return nil }
         return unsafeBitCast(graphicsContext, to: CGContext.self)
