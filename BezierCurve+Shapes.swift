@@ -43,7 +43,7 @@ extension BezierPath {
     }
 }
 
-/// Font initialization
+/// Character and String initialization
 extension BezierPath {
     /// Returns a path created from the character and the optional font
     public convenience init? (
@@ -77,7 +77,7 @@ extension BezierPath {
                 append(charPath) }
             apply(CGAffineTransform(translationX: -size.width, y: 0))
         }
-        translatePath(to: .zero)
+        zero()
     }
     
     /// Returns a path created from the supplied string and the font name and size
@@ -120,11 +120,11 @@ extension BezierPath {
         }
         
         let π = CGFloat(Double.pi); let 𝜏 = 2.0 * π
-        let path = BezierPath()
         let dθ = 𝜏 / CGFloat(sideCount)
         
         self.init()
         move(to: pointAt(0.0 + offset))
+        
         switch (percentInflection == 0.0, style) {
         case (true, _):
             for θ in stride(from: 0.0, through: 𝜏, by: dθ) {
@@ -140,8 +140,8 @@ extension BezierPath {
         case (false, .flatsingle):
             let cpθ = dθ / 2.0
             for θ in stride(from: 0.0, to: 𝜏, by: dθ) {
-                path.addLine(to: pointAt(θ + cpθ + offset, inflected: true))
-                path.addLine(to: pointAt(θ + dθ + offset))
+                addLine(to: pointAt(θ + cpθ + offset, inflected: true))
+                addLine(to: pointAt(θ + dθ + offset))
             }
         case (false, .curvedouble):
             let (cp1θ, cp2θ) = (dθ / 3.0, 2.0 * dθ / 3.0)

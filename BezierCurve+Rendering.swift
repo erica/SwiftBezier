@@ -51,14 +51,14 @@ fileprivate func currentGraphicsContext() -> CGContext? {
 /// Render path into a reasonably attractive image
 public extension BezierPath {
     public var renderedImage: Image? {
-        let path = translated(to: .zero)
+        let path = zeroed()
         let insetX: CGFloat = 8 // path.bounds.size.width * 0.10
         let insetY: CGFloat = 8 // path.bounds.size.height * 0.10
         var rect = path.bounds.insetBy(dx: -insetX, dy: -insetY); rect.origin = .zero
         let backdrop = BezierPath(roundedRect: rect, cornerRadius: max(insetX, insetY))
         let image = drawImage(to: rect.size) {
             Color.white.setFill(); backdrop.fill()
-            path.translatePath(to: insetX, insetY)
+            path.translate(to: CGPoint(x: insetX, y: insetY))
             path.stroke()
         }
         return image
