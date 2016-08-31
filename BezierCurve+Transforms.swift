@@ -56,7 +56,7 @@ public extension BezierPath {
     
     /// Returns a copy scaled by (sx, sy)
     public func scaled(sx: CGFloat, sy: CGFloat) -> BezierPath {
-        return applying(centered: Affineomat.scale(sx, sy))
+        return applying(centered: Affineomat.scale(sx: sx, sy: sy))
     }
     
     /// Scales in place by (factor, factor)

@@ -3,7 +3,7 @@ import Foundation
 /// Vends affine transforms
 public struct Affineomat {
     /// Translation by dx, dy
-    public static func translate(_ dx: CGFloat, _ dy: CGFloat) -> CGAffineTransform {
+    public static func translate(dx: CGFloat, dy: CGFloat) -> CGAffineTransform {
         return CGAffineTransform(translationX: dx, y: dy)
     }
     
@@ -18,13 +18,18 @@ public struct Affineomat {
     }
     
     /// Scale by sx, sy
-    public static func scale(_ sx: CGFloat, _ sy: CGFloat) -> CGAffineTransform {
+    public static func scale(sx: CGFloat, sy: CGFloat) -> CGAffineTransform {
         return CGAffineTransform(scaleX: sx, y: sy)
     }
     
     /// Scale by CGSize
     public static func scale(by size: CGSize) -> CGAffineTransform {
         return CGAffineTransform(scaleX: size.width, y: size.height)
+    }
+    
+    /// Scale by Factor
+    public static func scale(factor: CGFloat) -> CGAffineTransform {
+        return CGAffineTransform(scaleX: factor, y: factor)
     }
     
     /// Rotate by radians
