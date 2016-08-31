@@ -2,7 +2,7 @@
  
  Erica Sadun, http://ericasadun.com
  Shape initializers
- Requires Sizeomat.swift, Affinomat.swift
+ Requires Affineomat.swift from Geometry
  
  */
 
@@ -11,6 +11,50 @@
 #else
     import UIKit
 #endif
+
+// Included to avoid additional dependencies on a geometry library
+// but kept private to the file
+fileprivate extension CGRect {
+    /// Returns center
+    fileprivate var _center: CGPoint { return CGPoint(x: midX, y: midY) }
+
+    /// Constructs a rectangle around a center with the given size
+    fileprivate static func _around(_ center: CGPoint, size: CGSize) -> CGRect {
+        let origin = CGPoint(x: center.x - size.width / 2.0, y: center.y - size.height / 2.0)
+        return CGRect(origin: origin, size: size)
+    }
+    
+    /// Calculates the aspect scale between a source size
+    /// and a destination rectangle
+    fileprivate func _aspectScale(of sourceSize: CGSize) -> CGFloat {
+        let scaleW = width / sourceSize.width
+        let scaleH = height / sourceSize.height
+        return fmin(scaleW, scaleH)
+    }
+    
+    /// Fitting into a destination rectangle
+    fileprivate func _fitting(to destination: CGRect) -> CGRect {
+        let aspect = destination._aspectScale(of: size)
+        let targetSize = CGSize(width: width * aspect, height: height * aspect)
+        return CGRect._around(destination._center, size: targetSize)
+    }
+}
+
+fileprivate extension CGPoint {
+    /// Returns size representation
+    fileprivate var size: CGSize { return CGSize(width: x, height: y) }
+    
+    /// Returns negative extents
+    fileprivate var negative: CGPoint { return CGPoint(x: -x, y: -y) }
+}
+
+fileprivate extension CGSize {
+    /// Returns point representation
+    fileprivate var point: CGPoint { return CGPoint(x: width, y: height) }
+
+    /// Returns negative extents
+    fileprivate var negative: CGSize { return CGSize(width: -width, height: -height) }
+}
 
 public extension BezierPath {
     
@@ -22,7 +66,7 @@ public extension BezierPath {
     // MARK: Centered Application
     
     /// Return the path's center location
-    public var center: CGPoint { return bounds.center }
+    public var center: CGPoint { return bounds._center }
     
     /// Apply a transform with respect to the path center
     public func apply(centered transform: CGAffineTransform) {
@@ -85,12 +129,12 @@ public extension BezierPath {
     
     /// Offsets by dx, dy
     public func offset(dx: CGFloat, dy: CGFloat) {
-        apply(Affineomat.translate(by: CGSize(w: dx, h: dy)))
+        apply(Affineomat.translate(by: CGSize(width: dx, height: dy)))
     }
     
     /// Returns a copy offset by dx, dy
     public func offsetting(dx: CGFloat, dy: CGFloat) -> BezierPath {
-        return clone().applying(Affineomat.translate(by: CGSize(w: dx, h: dy)))
+        return clone().applying(Affineomat.translate(by: CGSize(width: dx, height: dy)))
     }
     
     // Translation with anchoring
@@ -154,9 +198,9 @@ public extension BezierPath {
     
     /// Fits to destination rectangle
     public func fit(to destRect: CGRect) {
-        let fitRect = bounds.fitting(to: destRect)
-        let aspect = destRect.aspectScale(of: bounds.size)
-        center(at: fitRect.center)
+        let fitRect = bounds._fitting(to: destRect)
+        let aspect = destRect._aspectScale(of: bounds.size)
+        center(at: fitRect._center)
         scale(sx: aspect, sy: aspect)
     }
     
