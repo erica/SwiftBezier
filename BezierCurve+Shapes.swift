@@ -3,6 +3,8 @@
  Erica Sadun, http://ericasadun.com
  Shape initializers
  
+ Samples: http://imgur.com/a/li3tf
+ 
  */
 
 #if os(OSX)
@@ -14,7 +16,7 @@
 /// Handy initializers
 extension BezierPath {
     /// Creates and returns a circle of a given radius around the origin
-    public convenience init(radius: CGFloat) {
+    public convenience init(circle radius: CGFloat) {
         self.init(ovalIn: CGRect(x: -radius, y: -radius, width: radius * 2, height: radius * 2))
     }
     
@@ -24,7 +26,7 @@ extension BezierPath {
     }
     
     /// Creates and returns an rectangle of the given width and height around the origin
-    public convenience init(rect width: CGFloat, _ height: CGFloat) {
+    public convenience init(width: CGFloat, _ height: CGFloat) {
         self.init(rect: CGRect(x: -width / 2.0, y: -height / 2.0, width: width, height: height))
     }
     
