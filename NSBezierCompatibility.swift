@@ -59,7 +59,7 @@ extension NSString {
         /// Transforms all points in the path using the specified affine transform matrix.
         open func apply(_ theTransform: CGAffineTransform) {
             let t = NSAffineTransform()
-            t.transformStruct = AffineTransform(m11: theTransform.a, m12: theTransform.b, m21: theTransform.c, m22: theTransform.d, tX: theTransform.tx, tY: theTransform.ty)
+            t.transformStruct = NSAffineTransformStruct(m11: theTransform.a, m12: theTransform.b, m21: theTransform.c, m22: theTransform.d, tX: theTransform.tx, tY: theTransform.ty)
             transform(using: t)
         }
         
