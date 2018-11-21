@@ -45,40 +45,127 @@ extension BezierPath {
     }
 }
 
+/// Extensions on built-in constructors
+extension BezierPath {
+    /// Creates and returns a new BezierPath object initialized with a
+    /// rectangular path inset on each side from the source rectangle
+    public convenience init(rect: CGRect, inset: CGFloat) {
+        let insetRect = rect.insetBy(dx: inset, dy: inset)
+        self.init(rect: insetRect)
+    }
+
+    /// Creates and returns a new BezierPath object initialized with a
+    /// rectangular path inset on each side from the source rectangle
+    public convenience init(rect: CGRect, insetX: CGFloat, insetY: CGFloat) {
+        let insetRect = rect.insetBy(dx: insetX, dy: insetY)
+        self.init(rect: insetRect)
+    }
+    
+    /// Creates and returns a new BezierPath object initialized with a
+    /// rounded rectangular path inset on each side from the source rectangle
+    public convenience init(roundedRect rect: CGRect, cornerRadius: CGFloat, inset: CGFloat) {
+        let insetRect = rect.insetBy(dx: inset, dy: inset)
+        self.init(roundedRect: insetRect, cornerRadius: cornerRadius)
+    }
+    
+    #if canImport(UIKit)
+    /// Creates and returns a new BezierPath object initialized with a
+    /// rounded rectangular path inset on each side from the source rectangle
+    public convenience init(roundedRect rect: CGRect, byRoundingCorners corners: UIRectCorner, cornerRadii radii: CGSize, insetX: CGFloat, insetY: CGFloat) {
+        let insetRect = rect.insetBy(dx: insetX, dy: insetY)
+        self.init(roundedRect: insetRect, byRoundingCorners: corners, cornerRadii: radii)
+    }
+    
+    /// Creates and returns a new BezierPath object initialized with a
+    /// rounded rectangular path inset on each side from the source rectangle
+    public convenience init(roundedRect rect: CGRect, byRoundingCorners corners: UIRectCorner, cornerRadii radii: CGSize, inset: CGFloat) {
+        let insetRect = rect.insetBy(dx: inset, dy: inset)
+        self.init(roundedRect: insetRect, byRoundingCorners: corners, cornerRadii: radii)
+    }
+    #endif
+    
+    /// Creates and returns a new BezierPath object initialized with a
+    /// rounded rectangular path inset on each side from the source rectangle
+    public convenience init(roundedRect rect: CGRect, cornerRadius: CGFloat, insetX: CGFloat, insetY: CGFloat) {
+        let insetRect = rect.insetBy(dx: insetX, dy: insetY)
+        self.init(roundedRect: insetRect, cornerRadius: cornerRadius)
+    }
+    /// Creates and returns a new BezierPath object initialized with a
+    /// rectangular path at a given origin, with specified x and y extents
+    public convenience init(rectFrom point: CGPoint, extentX: CGFloat, extentY: CGFloat) {
+        // Create a standardized rect at the specified point
+        let rect = CGRect(origin: point, size: CGSize(width: extentX, height: extentY)).standardized
+        self.init(rect: rect)
+    }
+    
+    /// Creates and returns a new BezierPath object initialized with an
+    /// oval path inscribed in the specified rectangle, inset on each side
+    /// from the source rectangle
+    public convenience init(ovalIn rect: CGRect, inset: CGFloat) {
+        let insetRect = rect.insetBy(dx: inset, dy: inset)
+        self.init(ovalIn: insetRect)
+    }
+    
+    /// Creates and returns a new BezierPath object initialized with an
+    /// oval path inscribed in the specified rectangle, inset on each side
+    /// from the source rectangle
+    public convenience init(ovalIn rect: CGRect, insetX: CGFloat, insetY: CGFloat) {
+        let insetRect = rect.insetBy(dx: insetX, dy: insetY)
+        self.init(ovalIn: insetRect)
+    }
+}
+
 /// Character and String initialization
 extension BezierPath {
-    /// Returns a path created from the character and the optional font
+    /// Returns a path created from a character and the optional font
     public convenience init? (
         character: Character,
-        font: Font = Font.boldSystemFont(ofSize: 32.0)) {
+        font: Font = Font.boldSystemFont(ofSize: 32.0))
+    {
+        // Create a new empty Bezier Path
         self.init()
-        var glyph = CGGlyph()
+        
         guard let unichar = String(character).utf16.first else { return nil }
-        var chars = [unichar]
-        if CTFontGetGlyphsForCharacters(font, &chars, &glyph, 1) {
-            guard let ctLetterPath = CTFontCreatePathForGlyph(font, glyph, nil) else { return nil }
-            self.append(BezierPath(cgPath: ctLetterPath))
-        } else { return nil }
+        var chars = [unichar] // store the character in array
+        var glyph = CGGlyph() // glyph storage
+        
+        // Get the glyph and convert it to a letter path
+        guard
+            CTFontGetGlyphsForCharacters(font, &chars, &glyph, 1),
+            let ctLetterPath = CTFontCreatePathForGlyph(font, glyph, nil)
+            else { return nil }
+        
+        // Add the letter path to the Bezier Path
+        self.append(BezierPath(cgPath: ctLetterPath))
     }
     
     /// Returns a path created from the character and the font name and size
     public convenience init? (
         character: Character,
         face: String = Font.boldSystemFont(ofSize: 32.0).fontName,
-        size: CGFloat) {
+        size: CGFloat)
+    {
         guard let font = Font(name: face, size: size) else { return nil }
         self.init(character: character, font: font)
     }
     
     /// Returns a path created from the supplied string and the optional font
     public convenience init? (string: String, font: Font = Font.boldSystemFont(ofSize: 32.0)) {
+        // Initialize an empty Bezier Path
         self.init()
-        for character in string.characters {
-            let size = NSString(string: String(character))._size(attributes: [NSFontAttributeName:font])
+        
+        // Iterate through each character
+        for character in string {
+            // Calculate rendered size
+            let size = NSString(string: String(character)).size(withAttributes: [NSAttributedString.Key.font: font])
+            // Append the path
             if let charPath = BezierPath(character: character, font: font) {
                 append(charPath) }
+            // Offset by the size of the character path
             apply(CGAffineTransform(translationX: -size.width, y: 0))
         }
+        
+        // Move the bounds origin for the full path back to (0, 0)
         zero()
     }
     
@@ -86,7 +173,8 @@ extension BezierPath {
     public convenience init? (
         string: String,
         face: String = Font.boldSystemFont(ofSize: 32.0).fontName,
-        size: CGFloat) {
+        size: CGFloat)
+    {
         guard let font = Font(name: face, size: size) else { return nil }
         self.init(string: string, font: font)
     }

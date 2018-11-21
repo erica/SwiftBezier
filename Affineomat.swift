@@ -1,7 +1,8 @@
 import Foundation
+import QuartzCore
 
 /// Vends affine transforms
-public struct Affineomat {
+public struct BezierAffineomat {
     /// Translation by dx, dy
     public static func translate(dx: CGFloat, dy: CGFloat) -> CGAffineTransform {
         return CGAffineTransform(translationX: dx, y: dy)

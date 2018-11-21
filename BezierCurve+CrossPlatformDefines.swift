@@ -4,29 +4,31 @@
  Cross Platform Defines
  
  Apple Platforms Only
- Will update to #if canImport() when available
  
  */
 
 import Foundation
 
-// Frameworks
-#if os(OSX)
-    import Cocoa
+// Frameworks. This offers `@_exported`. Avoid for
+// strict installs that frown on its use.
+#if canImport(UIKit)
+// @_exported import UIKit
+import UIKit
 #else
-    import UIKit
+// @_exported import Cocoa
+import Cocoa
 #endif
 
 // UIKit/Cocoa Classes
-#if os(OSX)
-    public typealias Font = NSFont
-    public typealias BezierPath = NSBezierPath
-    public typealias Image = NSImage
-    public typealias Color = NSColor
-#else
+#if canImport(UIKit)
 //    public typealias View = UIView
-    public typealias Font = UIFont
-    public typealias BezierPath = UIBezierPath
-    public typealias Image = UIImage
-    public typealias Color = UIColor
+public typealias Font = UIFont
+public typealias BezierPath = UIBezierPath
+public typealias Image = UIImage
+public typealias Color = UIColor
+#else
+public typealias Font = NSFont
+public typealias BezierPath = NSBezierPath
+public typealias Image = NSImage
+public typealias Color = NSColor
 #endif

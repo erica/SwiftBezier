@@ -2,7 +2,8 @@
  
  Erica Sadun, http://ericasadun.com
  Shape initializers
- Requires Affineomat.swift from Geometry
+ Requires Affineomat from Geometry, provided here as BezierAffineomat
+ to remove dependencies
  
  */
 
@@ -20,7 +21,9 @@ fileprivate extension CGRect {
 
     /// Constructs a rectangle around a center with the given size
     fileprivate static func _around(_ center: CGPoint, size: CGSize) -> CGRect {
-        let origin = CGPoint(x: center.x - size.width / 2.0, y: center.y - size.height / 2.0)
+        let origin = CGPoint(
+            x: center.x - size.width / 2.0,
+            y: center.y - size.height / 2.0)
         return CGRect(origin: origin, size: size)
     }
     
@@ -62,8 +65,8 @@ public extension BezierPath {
     public func clone() -> BezierPath {
         let path = BezierPath(); path.append(self); return path
     }
-
-    // MARK: Centered Application
+    
+    // MARK: Centered Transform Application
     
     /// Return the path's center location
     public var center: CGPoint { return bounds._center }
@@ -71,9 +74,9 @@ public extension BezierPath {
     /// Apply a transform with respect to the path center
     public func apply(centered transform: CGAffineTransform) {
         let centerPoint = center
-        apply(Affineomat.translate(by: centerPoint.negative.size))
+        apply(BezierAffineomat.translate(by: centerPoint.negative.size))
         apply(transform)
-        apply(Affineomat.translate(by: centerPoint.size))
+        apply(BezierAffineomat.translate(by: centerPoint.size))
     }    
     
     public func applying(centered transform: CGAffineTransform) -> BezierPath {
@@ -84,57 +87,66 @@ public extension BezierPath {
         apply(transform); return self
     }
     
-    
     // MARK: Common Transforms
     
     /// Scales in place by CGSize
-    public func scale(by factor: CGSize) { apply(centered: Affineomat.scale(by: factor)) }
+    public func scaleInPlace(by factor: CGSize) {
+        apply(centered: BezierAffineomat.scale(by: factor))
+    }
     
     /// Returns a copy scaled by CGSize
-    public func scaled(by factor: CGSize) -> BezierPath {
-        return applying(centered: Affineomat.scale(by: factor))
+    public func scaledInPlace(by factor: CGSize) -> BezierPath {
+        return applying(centered: BezierAffineomat.scale(by: factor))
     }
     
     /// Scales in place by (sx, sy)
-    public func scale(sx: CGFloat, sy: CGFloat) { scale(by: CGSize(width: sx, height: sy)) }
+    public func scaleInPlace(sx: CGFloat, sy: CGFloat) {
+        scaleInPlace(by: CGSize(width: sx, height: sy))
+    }
     
     /// Returns a copy scaled by (sx, sy)
-    public func scaled(sx: CGFloat, sy: CGFloat) -> BezierPath {
-        return applying(centered: Affineomat.scale(sx: sx, sy: sy))
+    public func scaledInPlace(sx: CGFloat, sy: CGFloat) -> BezierPath {
+        return applying(centered: BezierAffineomat.scale(sx: sx, sy: sy))
     }
     
     /// Scales in place by (factor, factor)
-    public func scale(factor: CGFloat) { scale(sx: factor, sy: factor) }
+    public func scaleInPlace(factor: CGFloat) {
+        scaleInPlace(sx: factor, sy: factor)
+    }
     
     /// Returns a copy scaled by (factor, factor)
-    public func scaled(factor: CGFloat) -> BezierPath { return scaled(sx: factor, sy: factor) }
+    public func scaledInPlace(factor: CGFloat) -> BezierPath {
+        return scaledInPlace(sx: factor, sy: factor)
+    }
     
     /// Rotates in place by radians
-    public func rotate(by radians: CGFloat) { apply(centered: Affineomat.rotate(by: radians)) }
+    public func rotateInPlace(by radians: CGFloat) {
+        apply(centered: BezierAffineomat.rotate(by: radians))
+    }
     
-    /// Returns a copy rotated by radians
-    public func rotated(by radians: CGFloat) -> BezierPath {
-        return clone().applying(centered: Affineomat.rotate(by: radians))
+    /// Returns a copy rotated in place by radians
+    public func rotatedInPlace(by radians: CGFloat) -> BezierPath {
+        return clone().applying(centered: BezierAffineomat.rotate(by: radians))
     }
     
     /// Offsets by CGSize
     public func offset(by offset: CGSize) {
-        apply(Affineomat.translate(by: offset))
+        apply(BezierAffineomat.translate(by: offset))
     }
     
     /// Returns a copy offset by CGSize
     public func offsetting(by offset: CGSize) -> BezierPath {
-        return clone().applying(Affineomat.translate(by: offset))
+        return clone().applying(BezierAffineomat.translate(by: offset))
     }
     
     /// Offsets by dx, dy
     public func offset(dx: CGFloat, dy: CGFloat) {
-        apply(Affineomat.translate(by: CGSize(width: dx, height: dy)))
+        apply(BezierAffineomat.translate(by: CGSize(width: dx, height: dy)))
     }
     
     /// Returns a copy offset by dx, dy
     public func offsetting(dx: CGFloat, dy: CGFloat) -> BezierPath {
-        return clone().applying(Affineomat.translate(by: CGSize(width: dx, height: dy)))
+        return clone().applying(BezierAffineomat.translate(by: CGSize(width: dx, height: dy)))
     }
     
     // Translation with anchoring
@@ -175,23 +187,23 @@ public extension BezierPath {
     // Mirroring
     
     /// Flips vertically in-place
-    public func flipVertically() {
-        apply(centered: Affineomat.vflip(height: bounds.height))
+    public func flipVerticallyInPlace() {
+        apply(centered: BezierAffineomat.vflip(height: bounds.height))
     }
     
     /// Returns a copy flipped vertically in place
-    public func flippedVertically() -> BezierPath {
-        return clone().applying(centered: Affineomat.vflip(height: bounds.height))
+    public func flippedVerticallyInPlace() -> BezierPath {
+        return clone().applying(centered: BezierAffineomat.vflip(height: bounds.height))
     }
     
     /// Flips horizontally in-place
-    public func flipHorizontally() {
-        apply(centered: Affineomat.hflip(width: bounds.width))
+    public func flipHorizontallyInPlace() {
+        apply(centered: BezierAffineomat.hflip(width: bounds.width))
     }
     
     /// Flips vertically in-place
-    public func flippedHorizontally() -> BezierPath {
-        return clone().applying(centered: Affineomat.hflip(width: bounds.width))
+    public func flippedHorizontallyInPlace() -> BezierPath {
+        return clone().applying(centered: BezierAffineomat.hflip(width: bounds.width))
     }
     
     // MARK: Fitting
@@ -201,7 +213,7 @@ public extension BezierPath {
         let fitRect = bounds._fitting(to: destRect)
         let aspect = destRect._aspectScale(of: bounds.size)
         center(at: fitRect._center)
-        scale(sx: aspect, sy: aspect)
+        scaleInPlace(sx: aspect, sy: aspect)
     }
     
     /// Returns a copy fitted to destination rectangle

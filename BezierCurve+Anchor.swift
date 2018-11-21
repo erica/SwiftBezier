@@ -14,8 +14,13 @@
 // Included to avoid additional dependencies on a geometry library
 // but kept private to the file
 fileprivate extension CGSize {
-    /// Shorthand initialization
-    fileprivate init(w: CGFloat, h: CGFloat) { (self.width, self.height) = (w, h) }
+    /// Shorthand initialization. It's obvious what this does
+    /// but it lacks the elegance of the normal Swift calls.
+    /// It's a compromise between the old `CGSizeMake` and the
+    /// new `width`/`height` style.
+    fileprivate init(w: CGFloat, h: CGFloat) {
+        self = CGSize(width: w, height: h)
+    }
 }
 
 /// Cardinal anchoring points
@@ -51,4 +56,27 @@ extension BezierPath {
         case .bottomright:  return CGSize(w: x + w,      h: y + h)
         }
     }
+    
+    /// Returns as point for the rare times you need positioning
+    /// rather than offsets
+    public subscript(atAnchor anchor: Anchor) -> CGPoint {
+        let (x, y) = (bounds.origin.x, bounds.origin.y)
+        let (w, h) = (bounds.size.width, bounds.size.height)
+        let (halfw, halfh) = (w / 2.0, h / 2.0)
+        
+        switch anchor {
+        case .topleft:      return CGPoint(x: x ,         y: y )
+        case .topcenter:    return CGPoint(x: x + halfw,  y: y )
+        case .topright:     return CGPoint(x: x + w,      y: y )
+            
+        case .centerleft:   return CGPoint(x: x ,         y: y + halfh)
+        case .center:       return CGPoint(x: x + halfw,  y: y + halfh)
+        case .centerright:  return CGPoint(x: x + w,      y: y + halfh)
+            
+        case .bottomleft:   return CGPoint(x: x ,         y: y + h)
+        case .bottomcenter: return CGPoint(x: x + halfw,  y: y + h)
+        case .bottomright:  return CGPoint(x: x + w,      y: y + h)
+        }
+    }
+
 }

@@ -7,10 +7,10 @@
  
  */
 
-#if os(OSX)
-    import Cocoa
+#if canImport(UIKit)
+import UIKit
 #else
-    import UIKit
+import Cocoa
 #endif
 
 // Included to avoid additional dependencies on a geometry library
@@ -19,7 +19,6 @@ fileprivate extension CGSize {
     /// Returns point representation
     fileprivate var _point: CGPoint { return CGPoint(x: width, y: height) }
 }
-
 
 extension BezierPath {
     /// Returns reference points for overlaying path
